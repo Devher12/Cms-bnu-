@@ -8,10 +8,52 @@ export interface SubscriptionRow {
   subscriptionStatus: "Active" | "Expired";
   paymentStatus: "PAID" | "UNPAID";
   challanInfo: string;
+  action: "Completed" | "Pay Now";
   isCurrent: boolean;
 }
 
+const MONTH_MAP: Record<string, number> = {
+  Jan: 0,
+  Feb: 1,
+  Mar: 2,
+  Apr: 3,
+  May: 4,
+  Jun: 5,
+  Jul: 6,
+  Aug: 7,
+  Sep: 8,
+  Oct: 9,
+  Nov: 10,
+  Dec: 11,
+};
+
+export function parseSubscriptionStartDate(startDate: string): Date {
+  const [, day, month, year] = startDate.match(/^(\d{2}) (\w{3}) (\d{4})$/) ?? [];
+  return new Date(Number(year), MONTH_MAP[month], Number(day));
+}
+
+export function sortSubscriptionRows(rows: SubscriptionRow[]): SubscriptionRow[] {
+  return [...rows].sort(
+    (a, b) =>
+      parseSubscriptionStartDate(b.startDate).getTime() -
+      parseSubscriptionStartDate(a.startDate).getTime()
+  );
+}
+
 export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
+  {
+    enrollmentId: "F2023-548",
+    tenure: "Monthly",
+    startDate: "01 Aug 2026",
+    endDate: "31 Aug 2026",
+    validTill: "31 Aug 2026",
+    amount: "4000/- PKR",
+    subscriptionStatus: "Active",
+    paymentStatus: "PAID",
+    challanInfo: "—",
+    action: "Completed",
+    isCurrent: true,
+  },
   {
     enrollmentId: "F2023-548",
     tenure: "Monthly",
@@ -21,8 +63,9 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     amount: "4000/- PKR",
     subscriptionStatus: "Active",
     paymentStatus: "PAID",
-    challanInfo: "",
-    isCurrent: true,
+    challanInfo: "—",
+    action: "Completed",
+    isCurrent: false,
   },
   {
     enrollmentId: "F2023-548",
@@ -34,6 +77,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     subscriptionStatus: "Expired",
     paymentStatus: "PAID",
     challanInfo: "—",
+    action: "Completed",
     isCurrent: false,
   },
   {
@@ -46,6 +90,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     subscriptionStatus: "Expired",
     paymentStatus: "UNPAID",
     challanInfo: "—",
+    action: "Completed",
     isCurrent: false,
   },
   {
@@ -58,6 +103,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     subscriptionStatus: "Expired",
     paymentStatus: "PAID",
     challanInfo: "—",
+    action: "Completed",
     isCurrent: false,
   },
   {
@@ -70,6 +116,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     subscriptionStatus: "Expired",
     paymentStatus: "UNPAID",
     challanInfo: "—",
+    action: "Completed",
     isCurrent: false,
   },
   {
@@ -82,6 +129,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     subscriptionStatus: "Expired",
     paymentStatus: "PAID",
     challanInfo: "—",
+    action: "Completed",
     isCurrent: false,
   },
   {
@@ -94,6 +142,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     subscriptionStatus: "Expired",
     paymentStatus: "PAID",
     challanInfo: "—",
+    action: "Completed",
     isCurrent: false,
   },
   {
@@ -106,6 +155,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     subscriptionStatus: "Expired",
     paymentStatus: "UNPAID",
     challanInfo: "—",
+    action: "Completed",
     isCurrent: false,
   },
   {
@@ -118,6 +168,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     subscriptionStatus: "Expired",
     paymentStatus: "PAID",
     challanInfo: "—",
+    action: "Completed",
     isCurrent: false,
   },
   {
@@ -130,6 +181,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     subscriptionStatus: "Expired",
     paymentStatus: "PAID",
     challanInfo: "—",
+    action: "Completed",
     isCurrent: false,
   },
   {
@@ -142,6 +194,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     subscriptionStatus: "Expired",
     paymentStatus: "UNPAID",
     challanInfo: "—",
+    action: "Completed",
     isCurrent: false,
   },
   {
@@ -154,6 +207,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     subscriptionStatus: "Expired",
     paymentStatus: "PAID",
     challanInfo: "—",
+    action: "Completed",
     isCurrent: false,
   },
 ];
@@ -187,7 +241,29 @@ function PaymentStatusBadge({ status }: { status: "PAID" | "UNPAID" }) {
   );
 }
 
+function ActionCell({ action }: { action: "Completed" | "Pay Now" }) {
+  if (action === "Pay Now") {
+    return (
+      <button
+        type="button"
+        disabled
+        className="cursor-not-allowed whitespace-nowrap rounded-full bg-[#bbdefb] px-3 py-1 text-xs font-bold text-[#1565c0]"
+      >
+        Pay Now
+      </button>
+    );
+  }
+
+  return (
+    <span className="inline-block whitespace-nowrap rounded-full bg-[#c8e6c9] px-3 py-1 text-xs font-bold text-[#1b5e20]">
+      Completed
+    </span>
+  );
+}
+
 export default function CurrentSubscriptionsTable() {
+  const sortedRows = sortSubscriptionRows(SUBSCRIPTION_MOCK_ROWS);
+
   return (
     <div className="overflow-hidden rounded-xl bg-white shadow-sm">
       <div className="overflow-x-auto">
@@ -216,7 +292,7 @@ export default function CurrentSubscriptionsTable() {
             </tr>
           </thead>
           <tbody>
-            {SUBSCRIPTION_MOCK_ROWS.map((row, index) => (
+            {sortedRows.map((row, index) => (
               <tr
                 key={`${row.startDate}-${index}`}
                 className="border-b border-[#e0e0e0] bg-white last:border-b-0"
@@ -235,9 +311,7 @@ export default function CurrentSubscriptionsTable() {
                 </td>
                 <td className="px-3 py-3 text-gray-500 sm:px-4">{row.challanInfo}</td>
                 <td className="px-3 py-3 sm:px-4">
-                  <span className="inline-block whitespace-nowrap rounded-full bg-[#c8e6c9] px-3 py-1 text-xs font-bold text-[#1b5e20]">
-                    Completed
-                  </span>
+                  <ActionCell action={row.action} />
                 </td>
               </tr>
             ))}
