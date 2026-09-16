@@ -44,6 +44,19 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
   {
     enrollmentId: "F2023-548",
     tenure: "Monthly",
+    startDate: "01 Sep 2026",
+    endDate: "30 Sep 2026",
+    validTill: "30 Sep 2026",
+    amount: "4000/- PKR",
+    subscriptionStatus: "Active",
+    paymentStatus: "PAID",
+    challanInfo: "—",
+    action: "Completed",
+    isCurrent: true,
+  },
+  {
+    enrollmentId: "F2023-548",
+    tenure: "Monthly",
     startDate: "01 Aug 2026",
     endDate: "31 Aug 2026",
     validTill: "31 Aug 2026",
@@ -52,7 +65,7 @@ export const SUBSCRIPTION_MOCK_ROWS: SubscriptionRow[] = [
     paymentStatus: "PAID",
     challanInfo: "—",
     action: "Completed",
-    isCurrent: true,
+    isCurrent: false,
   },
   {
     enrollmentId: "F2023-548",
